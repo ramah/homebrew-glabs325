@@ -40,6 +40,17 @@ Add `--zap` to also remove the app's local data.
 
 The casks download the signed and notarized disk images from the public release repositories [ramah/ramille-releases](https://github.com/ramah/ramille-releases) and [ramah/localepilot-releases](https://github.com/ramah/localepilot-releases). This repository contains only the cask files.
 
+## For maintainers
+
+After a new release is published in the release repository, update the cask with:
+
+```sh
+scripts/update-cask.sh ramille 1.0.1 1000123   # version, then build number (tag v1.0.1-b1000123)
+scripts/update-cask.sh localepilot 1.0.1       # tag v1.0.1
+```
+
+The script downloads the published disk image, computes its SHA-256 and rewrites the `version` and `sha256` lines. It never opens the image, and it does not commit: review `git diff`, then commit and push.
+
 ## Contact
 
 [ramille@glabs325.com](mailto:ramille@glabs325.com) · [localepilot@glabs325.com](mailto:localepilot@glabs325.com)
