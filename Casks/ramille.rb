@@ -3,8 +3,7 @@ cask "ramille" do
   version "1.0.0,1000099"
   sha256 "6c1324f3f5664a99b552248265d6d5d40c38fdbcd3b2492185dff3ae2d912b2a"
 
-  url "https://github.com/ramah/ramille-releases/releases/download/v#{version.csv.first}-b#{version.csv.second}/Ramille-#{version.csv.first}.dmg",
-      verified: "github.com/ramah/ramille-releases/"
+  url "https://github.com/ramah/ramille-releases/releases/download/v#{version.csv.first}-b#{version.csv.second}/Ramille-#{version.csv.first}.dmg"
   name "Ramille"
   desc "Git client that shows what you are about to push and the conflicts to expect"
   homepage "https://ramille.app/"
@@ -17,7 +16,7 @@ cask "ramille" do
   end
 
   auto_updates true
-  depends_on macos: ">= :monterey"
+  depends_on macos: :monterey
 
   app "Ramille.app"
 
