@@ -14,6 +14,15 @@ Both apps are commercial software with a free 14-day trial (14 days of use, no c
 - [Homebrew](https://brew.sh) on a Mac.
 - Ramille needs macOS 12 or later. LocalePilot needs macOS 13 or later.
 
+## Trust (Homebrew 6 and later)
+
+Homebrew asks you to trust third-party taps. Installing by full name, as in the table above, trusts only that cask. If you add the tap first with `brew tap ramah/glabs325`, trust the cask you want before installing it:
+
+```sh
+brew trust --cask ramah/glabs325/ramille
+brew trust --cask ramah/glabs325/localepilot
+```
+
 ## Updates
 
 Both apps update themselves through Sparkle. Homebrew also tracks new versions: `brew upgrade --cask ramille` or `brew upgrade --cask localepilot` installs the latest release published in the repositories below.
