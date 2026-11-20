@@ -1,0 +1,51 @@
+name: Mise à jour des casks
+
+# Deux fois par jour (heure UTC : 06 h 23 et 18 h 23), et à la demande depuis l'onglet Actions.
+# Le travail est fait par scripts/check-updates.sh : il ne modifie un cask que si la dernière release GitHub
+# et le fichier de mises à jour de l'app annoncent la même version.
+on:
+  schedule:
+    - cron: "23 6,18 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-casks
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Chercher de nouvelles versions publiées
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: scripts/check-updates.sh
+
+      - name: Enregistrer les casks modifiés
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- Casks; then
+            echo "Aucun cask modifié."
+          else
+            names="$(git diff --name-only -- Casks | xargs -n1 basename | sed 's/\.rb$//' | paste -sd, -)"
+            git commit -am "Casks : mise à jour automatique (${names})" -m "Version et empreinte lues sur la dernière release publiée, après accord du fichier de mises à jour de l'app."
+            git push
+          fi
+
+      - name: Garder les vérifications planifiées actives
+        # GitHub désactive les tâches planifiées d'un dépôt public après 60 jours sans activité.
+        run: |
+          last="$(git log -1 --format=%ct)"
+          if [ $(( $(date +%s) - last )) -gt $(( 50 * 86400 )) ]; then
+            git commit --allow-empty -m "Garder les vérifications planifiées actives (aucune activité depuis 50 jours)"
+            git push
+          else
+            echo "Activité récente : rien à faire."
+          fi

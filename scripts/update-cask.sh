@@ -46,7 +46,11 @@ trap 'rm -rf "$tmp"' EXIT
 
 echo "Téléchargement de ${base}/${file}"
 curl -fsSL "${base}/${file}" -o "${tmp}/app.dmg"
-sha="$(shasum -a 256 "${tmp}/app.dmg" | cut -d' ' -f1)"
+if command -v shasum >/dev/null 2>&1; then
+  sha="$(shasum -a 256 "${tmp}/app.dmg" | cut -d' ' -f1)"
+else
+  sha="$(sha256sum "${tmp}/app.dmg" | cut -d' ' -f1)"
+fi
 
 # LocalePilot publie aussi l'empreinte à côté du DMG : on la compare.
 if [ "$app" = "localepilot" ]; then
@@ -66,8 +70,9 @@ if [ "$app" = "localepilot" ]; then
   fi
 fi
 
-sed -i '' -E "s/^  version \".*\"/  version \"${newversion}\"/; s/^  sha256 \".*\"/  sha256 \"${sha}\"/" "$cask"
-ruby -c "$cask" >/dev/null
+sed -E "s/^  version \".*\"/  version \"${newversion}\"/; s/^  sha256 \".*\"/  sha256 \"${sha}\"/" "$cask" > "${tmp}/cask.rb"
+cat "${tmp}/cask.rb" > "$cask"
+if command -v ruby >/dev/null 2>&1; then ruby -c "$cask" >/dev/null; fi
 
 echo "version ${newversion}"
 echo "sha256  ${sha}"

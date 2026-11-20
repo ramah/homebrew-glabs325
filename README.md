@@ -42,14 +42,19 @@ The casks download the signed and notarized disk images from the public release 
 
 ## For maintainers
 
-After a new release is published in the release repository, update the cask with:
+The casks follow the releases automatically. Twice a day, a GitHub Action (`.github/workflows/update-casks.yml`) runs `scripts/check-updates.sh`. It reads the latest release of each release repository and changes a cask only when the app's update feed (the Sparkle appcast) announces the same version. If the minimum macOS version changes, it stops with an error and asks for a manual review.
+
+You can run the same check by hand, or update one cask yourself:
 
 ```sh
+scripts/check-updates.sh
 scripts/update-cask.sh ramille 1.0.1 1000123   # version, then build number (tag v1.0.1-b1000123)
 scripts/update-cask.sh localepilot 1.0.1       # tag v1.0.1
 ```
 
-The script downloads the published disk image, computes its SHA-256 and rewrites the `version` and `sha256` lines. It never opens the image, and it does not commit: review `git diff`, then commit and push.
+The scripts download the published disk image, compute its SHA-256 and rewrite the `version` and `sha256` lines. They never open the image and never commit by hand: review `git diff` before committing.
+
+If the Actions tab shows the workflow as disabled (GitHub does that after 60 days without activity in a public repository), enable it again there.
 
 ## Contact
 
